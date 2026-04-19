@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design by Cloe — Plateforme de pilotage</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --coral: #f76c5e;
+    --coral-dark: #e85a4c;
+    --dark-blue: #2321bc;
+    --dark-blue-deep: #1a1988;
+    --blue: #6296f7;
+    --light-blue: #afc1ed;
+    --pastel: #f0f2f9;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border: #e5e7eb;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #f0f2f9 0%, #e8ecf5 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ========== SIDEBAR ========== */
+  .sidebar {
+    background: linear-gradient(180deg, var(--dark-blue) 0%, var(--dark-blue-deep) 100%);
+    color: white;
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .brand {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 24px;
+  }
+  .brand-logo {
+    width: 48px; height: 48px;
+    background: var(--coral);
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -1px;
+  }
+  .brand-logo span { color: var(--light-blue); }
+  .brand-text strong { display: block; font-size: 15px; font-weight: 700; }
+  .brand-text small { font-size: 11px; opacity: 0.6; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
+  .nav-item.active {
+    background: rgba(247, 108, 94, 0.15);
+    color: white;
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--coral);
+  }
+  .nav-item svg { width: 18px; height: 18px; }
+
+  .sidebar-footer {
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .footer-tag {
+    font-size: 11px;
+    opacity: 0.5;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* ========== MAIN ========== */
+  .main { padding: 40px 48px; overflow-y: auto; }
+  .view { display: flex; flex-direction: column; gap: 24px; max-width: 1400px; }
+  .view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .view-title {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--dark-blue);
+  }
+  .view-subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  /* ========== CARD ========== */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(35, 33, 188, 0.04), 0 4px 20px rgba(35, 33, 188, 0.04);
+    border: 1px solid rgba(35, 33, 188, 0.05);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--dark-blue);
+    margin-bottom: 18px;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  /* ========== BUTTONS ========== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  .btn-primary {
+    background: var(--coral);
+    color: white;
+    box-shadow: 0 4px 14px rgba(247, 108, 94, 0.3);
+  }
+  .btn-primary:hover {
+    background: var(--coral-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(247, 108, 94, 0.4);
+  }
+  .btn-ghost { background: transparent; color: var(--muted); }
+  .btn-ghost:hover { background: var(--pastel); color: var(--dark-blue); }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--muted);
+    display: grid;
+    place-items: center;
+    transition: all 0.2s;
+  }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .icon-btn:hover { background: var(--pastel); color: var(--dark-blue); }
+  .icon-btn-danger:hover { background: #fee2e2; color: var(--danger); }
+
+  /* ========== KPI ========== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .kpi { position: relative; overflow: hidden; }
+  .kpi-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    margin-bottom: 14px;
+  }
+  .kpi-icon svg { width: 22px; height: 22px; }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 6px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .kpi-coral .kpi-icon { background: #fce5e2; color: var(--coral); }
+  .kpi-warning .kpi-icon { background: #fef3c7; color: var(--warning); }
+  .kpi-blue .kpi-icon { background: #dbeafe; color: var(--blue); }
+  .kpi-dark .kpi-icon { background: #e0e7ff; color: var(--dark-blue); }
+  .kpi-success .kpi-icon { background: #d1fae5; color: var(--success); }
+  .kpi-danger .kpi-icon { background: #fee2e2; color: var(--danger); }
+
+  /* ========== GRIDS ========== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-2-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  .mini-stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+  }
+  .mini-stat strong { font-size: 20px; color: var(--dark-blue); }
+  .mini-stat svg { width: 20px; height: 20px; }
+
+  /* ========== CLIENT CARDS ========== */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .client-card { display: flex; gap: 16px; position: relative; }
+  .client-avatar {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--coral), #f59481);
+    color: white;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-weight: 800;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .client-info { flex: 1; min-width: 0; }
+  .client-info h4 { font-size: 16px; font-weight: 700; }
+  .client-company { font-size: 13px; color: var(--dark-blue); font-weight: 600; margin-top: 2px; }
+  .client-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+  /* ========== FILTERS ========== */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip:hover { border-color: var(--dark-blue); color: var(--dark-blue); }
+  .chip.active {
+    background: var(--dark-blue);
+    color: white;
+    border-color: var(--dark-blue);
+  }
+
+  /* ========== CONTRACTS ========== */
+  .contracts-list { display: flex; flex-direction: column; gap: 12px; }
+  .contract-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .contract-main { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .contract-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .contract-header h4 { font-size: 16px; font-weight: 700; }
+  .contract-client { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .contract-amount { font-size: 20px; font-weight: 800; color: var(--dark-blue); white-space: nowrap; }
+  .contract-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .contract-timeline {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+
+  /* ========== BADGE ========== */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  /* ========== EMPTY ========== */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 60px 24px;
+    text-align: center;
+  }
+  .empty-state p { color: var(--muted); font-size: 14px; }
+  .empty-state svg { width: 40px; height: 40px; color: var(--light-blue); }
+  .empty { text-align: center; color: #9ca3af; padding: 30px 10px; font-size: 13px; }
+
+  /* ========== TABLE ========== */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table td {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .table tr:hover td { background: #f9fafb; }
+  .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+
+  /* ========== MINI LIST ========== */
+  .mini-list { display: flex; flex-direction: column; gap: 8px; }
+  .mini-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  /* ========== KANBAN ========== */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .kanban { grid-template-columns: 1fr; } }
+  .kanban-col {
+    background: var(--pastel);
+    border-radius: 14px;
+    min-height: 200px;
+    overflow: hidden;
+  }
+  .kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 16px 14px 12px;
+    border-top: 3px solid;
+  }
+  .kanban-header > div { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .kanban-header svg { width: 18px; height: 18px; }
+  .kanban-count {
+    background: var(--pastel);
+    color: var(--muted);
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .kanban-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+  }
+  .kanban-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 30px 10px;
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  .project-card { padding: 16px; }
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .project-header h4 { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .project-client { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .project-deadline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--warning);
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .project-deadline svg { width: 13px; height: 13px; }
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dark-blue);
+  }
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--pastel);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--dark-blue));
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+
+  /* ========== MODAL ========== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(35, 33, 188, 0.15);
+    backdrop-filter: blur(6px);
+    display: none;
+    place-items: center;
+    z-index: 100;
+    padding: 20px;
+    animation: fadeIn 0.2s;
+  }
+  .modal-overlay.open { display: grid; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(35, 33, 188, 0.2);
+    animation: slideUp 0.3s ease-out;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--pastel);
+  }
+  .modal-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-blue);
+  }
+  .modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--muted);
+  }
+  .modal-close:hover { background: var(--pastel); color: var(--dark-blue); }
+  .modal-body {
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 18px;
+    border-top: 1px solid var(--pastel);
+    margin-top: 8px;
+  }
+
+  /* ========== FIELDS ========== */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field-input {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: inherit;
+    font-size: 14px;
+    background: white;
+    color: var(--text);
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--dark-blue);
+    box-shadow: 0 0 0 3px rgba(35, 33, 188, 0.08);
+  }
+  textarea.field-input { resize: vertical; min-height: 70px; }
+
+  .chart-wrap {
+    position: relative;
+    height: 260px;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; flex-direction: row; padding: 16px; }
+    .brand { padding: 0; margin: 0; border: none; flex-shrink: 0; }
+    .nav { flex-direction: row; overflow-x: auto; margin-left: 20px; }
+    .sidebar-footer { display: none; }
+    .main { padding: 24px; }
+    .grid-2-form { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">D<span>C</span></div>
+      <div class="brand-text">
+        <strong>Design by Cloe</strong>
+        <small>Plateforme de pilotage</small>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav"></nav>
+
+    <div class="sidebar-footer">
+      <div class="footer-tag">Made with ♥ in Ardennes</div>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main" id="main"></main>
+</div>
+
+<!-- ========== MODAL CONTAINER ========== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="closeModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const SERVICES = [
+  { id: 'identite', label: 'Identité visuelle', color: '#f76c5e' },
+  { id: 'strategie', label: 'Stratégie', color: '#2321bc' },
+  { id: 'rs', label: 'Gestion RS', color: '#6296f7' },
+  { id: 'print', label: 'Print', color: '#afc1ed' },
+  { id: 'autre', label: 'Autre', color: '#9ca3af' },
+];
+
+const CONTRACT_STATUS = {
+  quote_sent:    { label: 'Devis envoyé',     color: '#6296f7', icon: 'send' },
+  quote_signed:  { label: 'Devis signé',      color: '#2321bc', icon: 'pen' },
+  invoice_sent:  { label: 'Facture envoyée',  color: '#f59e0b', icon: 'receipt' },
+  invoice_paid:  { label: 'Facture payée',    color: '#10b981', icon: 'check' },
+};
+
+const PROJECT_STATUS = {
+  not_started: { label: 'Pas commencé', color: '#9ca3af', icon: 'circle' },
+  in_progress: { label: 'En cours',     color: '#6296f7', icon: 'play' },
+  completed:   { label: 'Terminé',      color: '#10b981', icon: 'check' },
+};
+
+// État global — chargé depuis localStorage
+let state = {
+  view: 'dashboard',
+  clients:   load('dbc:clients',   []),
+  contracts: load('dbc:contracts', []),
+  projects:  load('dbc:projects',  []),
+  expenses:  load('dbc:expenses',  []),
+};
+
+function load(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+function save(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+function saveAll() {
+  save('dbc:clients',   state.clients);
+  save('dbc:contracts', state.contracts);
+  save('dbc:projects',  state.projects);
+  save('dbc:expenses',  state.expenses);
+}
+
+// ============================================================
+// ICONS (SVG inline)
+// ============================================================
+const ICONS = {
+  dashboard: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
+  users:     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  file:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  wallet:    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4z"/></svg>',
+  kanban:    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
+  plus:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  edit:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+  trash:     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
+  euro:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h9M19 6.4A7.5 7.5 0 0 0 14 4.5a7.5 7.5 0 0 0 0 15 7.5 7.5 0 0 0 5-1.9"/></svg>',
+  alert:     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  trending:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  send:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+  pen:       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+  receipt:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg>',
+  check:     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  clock:     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  circle:    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>',
+  play:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+  calendar:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+const fmtEur = n => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n || 0);
+const fmtDate = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
+const todayISO = () => new Date().toISOString().split('T')[0];
+const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString() + Math.random().toString(36).slice(2, 6);
+
+// ============================================================
+// MODAL
+// ============================================================
+let modalSubmitHandler = null;
+
+function openModal(title, bodyHtml, onSubmit) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modal').classList.add('open');
+  modalSubmitHandler = onSubmit;
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  modalSubmitHandler = null;
+}
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+function submitModal() {
+  if (modalSubmitHandler) modalSubmitHandler();
+}
+
+// ============================================================
+// NAV
+// ============================================================
+const NAV = [
+  { id: 'dashboard',  label: 'Dashboard',    icon: 'dashboard' },
+  { id: 'clients',    label: 'Clients',      icon: 'users' },
+  { id: 'contracts',  label: 'Contrats',     icon: 'file' },
+  { id: 'accounting', label: 'Comptabilité', icon: 'wallet' },
+  { id: 'projects',   label: 'Projets',      icon: 'kanban' },
+];
+
+function renderNav() {
+  document.getElementById('nav').innerHTML = NAV.map(n => `
+    <button class="nav-item ${state.view === n.id ? 'active' : ''}" onclick="setView('${n.id}')">
+      ${ICONS[n.icon]} ${n.label}
+    </button>
+  `).join('');
+}
+
+function setView(v) {
+  state.view = v;
+  render();
+}
+
+// ============================================================
+// RENDER MAIN
+// ============================================================
+function render() {
+  renderNav();
+  const main = document.getElementById('main');
+  switch (state.view) {
+    case 'dashboard':  main.innerHTML = renderDashboard();  renderDashboardCharts(); break;
+    case 'clients':    main.innerHTML = renderClients();    break;
+    case 'contracts':  main.innerHTML = renderContracts();  break;
+    case 'accounting': main.innerHTML = renderAccounting(); renderAccountingChart(); break;
+    case 'projects':   main.innerHTML = renderProjects();   break;
+  }
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function computeStats() {
+  const { contracts, expenses } = state;
+  const paid = contracts.filter(c => c.invoiceStatus === 'paid').reduce((s,c)=>s+Number(c.amount||0),0);
+  const unpaid = contracts.filter(c => c.invoiceStatus === 'sent').reduce((s,c)=>s+Number(c.amount||0),0);
+  const quoted = contracts.filter(c => ['quote_sent','quote_signed'].includes(c.status)).reduce((s,c)=>s+Number(c.amount||0),0);
+  const totalExpenses = expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+
+  const byService = SERVICES.map(s => ({
+    label: s.label,
+    value: contracts.filter(c => c.service === s.id && c.invoiceStatus === 'paid').reduce((sum,c)=>sum+Number(c.amount||0),0),
+    color: s.color,
+  })).filter(x => x.value > 0);
+
+  const now = new Date();
+  const monthly = Array.from({length: 6}, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const revenue = contracts
+      .filter(c => c.invoiceStatus === 'paid' && c.paidDate && c.paidDate.startsWith(monthKey))
+      .reduce((s,c)=>s+Number(c.amount||0),0);
+    return { month: d.toLocaleDateString('fr-FR',{month:'short'}), CA: revenue };
+  });
+
+  return { paid, unpaid, quoted, totalExpenses, byService, monthly };
+}
+
+function renderDashboard() {
+  const s = computeStats();
+  const inProgress = state.projects.filter(p => p.status === 'in_progress').length;
+  const notStarted = state.projects.filter(p => p.status === 'not_started').length;
+
+  return `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Tableau de bord</h2>
+          <p class="view-subtitle">Vue d'ensemble de ton activité</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="card kpi kpi-coral">
+          <div class="kpi-icon">${ICONS.euro}</div>
+          <div class="kpi-label">CA encaissé</div>
+          <div class="kpi-value">${fmtEur(s.paid)}</div>
+        </div>
+        <div class="card kpi kpi-warning">
+          <div class="kpi-icon">${ICONS.alert}</div>
+          <div class="kpi-label">Impayés</div>
+          <div class="kpi-value">${fmtEur(s.unpaid)}</div>
+        </div>
+        <div class="card kpi kpi-blue">
+          <div class="kpi-icon">${ICONS.send}</div>
+          <div class="kpi-label">Devis en cours</div>
+          <div class="kpi-value">${fmtEur(s.quoted)}</div>
+        </div>
+        <div class="card kpi kpi-dark">
+          <div class="kpi-icon">${ICONS.trending}</div>
+          <div class="kpi-label">Bénéfice net</div>
+          <div class="kpi-value">${fmtEur(s.paid - s.totalExpenses)}</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title">CA des 6 derniers mois</h3>
+          <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">CA par prestation</h3>
+          ${s.byService.length === 0
+            ? '<div class="empty">Pas encore de CA encaissé</div>'
+            : '<div class="chart-wrap"><canvas id="chartPie"></canvas></div>'}
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card mini-stat" style="color:var(--dark-blue)">
+          ${ICONS.kanban}
+          <div><strong>${inProgress}</strong> projet${inProgress>1?'s':''} en cours</div>
+        </div>
+        <div class="card mini-stat" style="color:var(--blue)">
+          ${ICONS.clock}
+          <div><strong>${notStarted}</strong> à démarrer</div>
+        </div>
+        <div class="card mini-stat" style="color:var(--coral)">
+          ${ICONS.users}
+          <div><strong>${state.clients.length}</strong> client${state.clients.length>1?'s':''}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+let chartMonthly, chartPie, chartBar;
+
+function renderDashboardCharts() {
+  const s = computeStats();
+
+  // LINE / AREA chart
+  const ctx1 = document.getElementById('chartMonthly');
+  if (ctx1) {
+    if (chartMonthly) chartMonthly.destroy();
+    const gradient = ctx1.getContext('2d').createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, 'rgba(247, 108, 94, 0.5)');
+    gradient.addColorStop(1, 'rgba(247, 108, 94, 0.02)');
+    chartMonthly = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: s.monthly.map(x => x.month),
+        datasets: [{
+          label: 'CA',
+          data: s.monthly.map(x => x.CA),
+          borderColor: '#f76c5e',
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: '#f76c5e',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => fmtEur(c.parsed.y) } }
+        },
+        scales: {
+          y: { ticks: { callback: v => fmtEur(v) }, grid: { color: '#f3f4f6' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // PIE chart
+  const ctx2 = document.getElementById('chartPie');
+  if (ctx2 && s.byService.length > 0) {
+    if (chartPie) chartPie.destroy();
+    chartPie = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: s.byService.map(x => x.label),
+        datasets: [{
+          data: s.byService.map(x => x.value),
+          backgroundColor: s.byService.map(x => x.color),
+          borderWidth: 3,
+          borderColor: 'white',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 11 } } },
+          tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtEur(c.parsed)}` } }
+        }
+      }
+    });
+  }
+}
+
+// ============================================================
+// CLIENTS
+// ============================================================
+function renderClients() {
+  const clients = state.clients;
+  return `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Clients</h2>
+          <p class="view-subtitle">${clients.length} client${clients.length>1?'s':''} enregistré${clients.length>1?'s':''}</p>
+        </div>
+        <button class="btn btn-primary" onclick="openClientModal()">${ICONS.plus} Nouveau client</button>
+      </div>
+      ${clients.length === 0 ? `
+        <div class="card empty-state">
+          ${ICONS.users}
+          <p>Aucun client pour l'instant</p>
+          <button class="btn btn-primary" onclick="openClientModal()">${ICONS.plus} Ajouter le premier</button>
+        </div>
+      ` : `
+        <div class="cards-grid">
+          ${clients.map(c => `
+            <div class="card client-card">
+              <div class="client-avatar">${escapeHtml(c.name.charAt(0).toUpperCase())}</div>
+              <div class="client-info">
+                <h4>${escapeHtml(c.name)}</h4>
+                ${c.company ? `<p class="client-company">${escapeHtml(c.company)}</p>` : ''}
+                ${c.email   ? `<p class="client-meta">${escapeHtml(c.email)}</p>` : ''}
+                ${c.phone   ? `<p class="client-meta">${escapeHtml(c.phone)}</p>` : ''}
+                ${c.location? `<p class="client-meta">${escapeHtml(c.location)}</p>` : ''}
+              </div>
+              <div class="card-actions">
+                <button class="icon-btn" onclick="openClientModal('${c.id}')">${ICONS.edit}</button>
+                <button class="icon-btn icon-btn-danger" onclick="deleteClient('${c.id}')">${ICONS.trash}</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openClientModal(id) {
+  const c = id ? state.clients.find(x => x.id === id) : { name:'', company:'', email:'', phone:'', location:'' };
+  openModal(id ? 'Modifier client' : 'Nouveau client', `
+    ${field('Nom *', `<input class="field-input" id="f_name" value="${escapeHtml(c.name)}">`)}
+    ${field('Entreprise', `<input class="field-input" id="f_company" value="${escapeHtml(c.company||'')}">`)}
+    ${field('Email', `<input class="field-input" type="email" id="f_email" value="${escapeHtml(c.email||'')}">`)}
+    ${field('Téléphone', `<input class="field-input" id="f_phone" value="${escapeHtml(c.phone||'')}">`)}
+    ${field('Localisation', `<input class="field-input" id="f_location" value="${escapeHtml(c.location||'')}">`)}
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitModal()">${id ? 'Enregistrer' : 'Créer'}</button>
+    </div>
+  `, () => {
+    const data = {
+      name:     document.getElementById('f_name').value.trim(),
+      company:  document.getElementById('f_company').value.trim(),
+      email:    document.getElementById('f_email').value.trim(),
+      phone:    document.getElementById('f_phone').value.trim(),
+      location: document.getElementById('f_location').value.trim(),
+    };
+    if (!data.name) return;
+    if (id) {
+      state.clients = state.clients.map(x => x.id === id ? { ...data, id } : x);
+    } else {
+      state.clients.push({ ...data, id: uid() });
+    }
+    saveAll();
+    closeModal();
+    render();
+  });
+}
+
+function deleteClient(id) {
+  if (!confirm('Supprimer ce client ?')) return;
+  state.clients = state.clients.filter(x => x.id !== id);
+  saveAll();
+  render();
+}
+
+// ============================================================
+// CONTRATS
+// ============================================================
+let contractFilter = 'all';
+
+function renderContracts() {
+  const all = state.contracts;
+  const list = contractFilter === 'all' ? all : all.filter(c => c.status === contractFilter);
+  const clientName = id => state.clients.find(c => c.id === id)?.name || 'Client inconnu';
+
+  return `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Contrats</h2>
+          <p class="view-subtitle">${all.length} contrat${all.length>1?'s':''}</p>
+        </div>
+        <button class="btn btn-primary" onclick="openContractModal()">${ICONS.plus} Nouveau contrat</button>
+      </div>
+
+      <div class="filters">
+        <button class="chip ${contractFilter==='all'?'active':''}" onclick="setContractFilter('all')">Tous</button>
+        ${Object.entries(CONTRACT_STATUS).map(([k,s]) => `
+          <button class="chip ${contractFilter===k?'active':''}"
+            ${contractFilter===k ? `style="background:${s.color};color:white;border-color:${s.color}"` : ''}
+            onclick="setContractFilter('${k}')">${s.label}</button>
+        `).join('')}
+      </div>
+
+      ${list.length === 0 ? `
+        <div class="card empty-state">
+          ${ICONS.file}
+          <p>Aucun contrat</p>
+          <button class="btn btn-primary" onclick="openContractModal()">${ICONS.plus} Créer un contrat</button>
+        </div>
+      ` : `
+        <div class="contracts-list">
+          ${list.map(c => {
+            const s = CONTRACT_STATUS[c.status];
+            const srv = SERVICES.find(x => x.id === c.service);
+            return `
+              <div class="card contract-card">
+                <div class="contract-main">
+                  <div class="contract-header">
+                    <div>
+                      <h4>${escapeHtml(c.title)}</h4>
+                      <p class="contract-client">${escapeHtml(clientName(c.clientId))}</p>
+                    </div>
+                    <div class="contract-amount">${fmtEur(c.amount)}</div>
+                  </div>
+                  <div class="contract-meta">
+                    ${badge(s.label, s.color)}
+                    ${srv ? badge(srv.label, srv.color) : ''}
+                  </div>
+                  <div class="contract-timeline">
+                    ${c.quoteSentDate    ? `<span>📤 Devis envoyé : ${fmtDate(c.quoteSentDate)}</span>` : ''}
+                    ${c.quoteSignedDate  ? `<span>✍️ Signé : ${fmtDate(c.quoteSignedDate)}</span>` : ''}
+                    ${c.invoiceSentDate  ? `<span>🧾 Facturé : ${fmtDate(c.invoiceSentDate)}</span>` : ''}
+                    ${c.paidDate         ? `<span>✅ Payé : ${fmtDate(c.paidDate)}</span>` : ''}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="icon-btn" onclick="openContractModal('${c.id}')">${ICONS.edit}</button>
+                  <button class="icon-btn icon-btn-danger" onclick="deleteContract('${c.id}')">${ICONS.trash}</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function setContractFilter(f) { contractFilter = f; render(); }
+
+function openContractModal(id) {
+  const c = id ? state.contracts.find(x => x.id === id) : {
+    title:'', clientId:'', service:'identite', amount:'',
+    status:'quote_sent',
+    quoteSentDate: todayISO(), quoteSignedDate:'', invoiceSentDate:'', paidDate:'',
+    notes:'',
+  };
+
+  const clientOpts = [{id:'', name:'— Choisir —'}, ...state.clients];
+
+  openModal(id ? 'Modifier contrat' : 'Nouveau contrat', `
+    ${field('Titre *', `<input class="field-input" id="f_title" value="${escapeHtml(c.title)}">`)}
+    ${field('Client *', select('f_clientId', clientOpts.map(x => ({value:x.id, label:x.name})), c.clientId))}
+    <div class="grid-2-form">
+      ${field('Prestation', select('f_service', SERVICES.map(s=>({value:s.id,label:s.label})), c.service))}
+      ${field('Montant (€)', `<input class="field-input" type="number" step="0.01" id="f_amount" value="${escapeHtml(c.amount)}">`)}
+    </div>
+    ${field('Statut', select('f_status', Object.entries(CONTRACT_STATUS).map(([k,v])=>({value:k,label:v.label})), c.status))}
+    <div class="grid-2-form">
+      ${field('Devis envoyé le', `<input class="field-input" type="date" id="f_quoteSentDate" value="${c.quoteSentDate||''}">`)}
+      ${field('Devis signé le', `<input class="field-input" type="date" id="f_quoteSignedDate" value="${c.quoteSignedDate||''}">`)}
+      ${field('Facture envoyée le', `<input class="field-input" type="date" id="f_invoiceSentDate" value="${c.invoiceSentDate||''}">`)}
+      ${field('Payé le', `<input class="field-input" type="date" id="f_paidDate" value="${c.paidDate||''}">`)}
+    </div>
+    ${field('Notes', `<textarea class="field-input" id="f_notes">${escapeHtml(c.notes||'')}</textarea>`)}
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitModal()">${id?'Enregistrer':'Créer'}</button>
+    </div>
+  `, () => {
+    const status = document.getElementById('f_status').value;
+    const data = {
+      title:    document.getElementById('f_title').value.trim(),
+      clientId: document.getElementById('f_clientId').value,
+      service:  document.getElementById('f_service').value,
+      amount:   Number(document.getElementById('f_amount').value) || 0,
+      status,
+      quoteSentDate:   document.getElementById('f_quoteSentDate').value,
+      quoteSignedDate: document.getElementById('f_quoteSignedDate').value,
+      invoiceSentDate: document.getElementById('f_invoiceSentDate').value,
+      paidDate:        document.getElementById('f_paidDate').value,
+      notes:           document.getElementById('f_notes').value,
+    };
+    // sync invoiceStatus depuis status
+    if (status === 'invoice_paid') data.invoiceStatus = 'paid';
+    else if (status === 'invoice_sent') data.invoiceStatus = 'sent';
+    else data.invoiceStatus = 'none';
+
+    if (!data.title || !data.clientId) return;
+    if (id) state.contracts = state.contracts.map(x => x.id === id ? { ...data, id } : x);
+    else state.contracts.push({ ...data, id: uid() });
+    saveAll();
+    closeModal();
+    render();
+  });
+}
+
+function deleteContract(id) {
+  if (!confirm('Supprimer ce contrat ?')) return;
+  state.contracts = state.contracts.filter(x => x.id !== id);
+  saveAll();
+  render();
+}
+
+// ============================================================
+// COMPTABILITÉ
+// ============================================================
+function renderAccounting() {
+  const { contracts, expenses } = state;
+  const paid = contracts.filter(c => c.invoiceStatus === 'paid');
+  const unpaid = contracts.filter(c => c.invoiceStatus === 'sent');
+  const totalPaid = paid.reduce((s,c)=>s+Number(c.amount||0),0);
+  const totalUnpaid = unpaid.reduce((s,c)=>s+Number(c.amount||0),0);
+  const totalExp = expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+
+  return `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Comptabilité</h2>
+          <p class="view-subtitle">Vue financière détaillée</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="card kpi kpi-success">
+          <div class="kpi-icon">${ICONS.check}</div>
+          <div class="kpi-label">Encaissé</div>
+          <div class="kpi-value">${fmtEur(totalPaid)}</div>
+        </div>
+        <div class="card kpi kpi-warning">
+          <div class="kpi-icon">${ICONS.clock}</div>
+          <div class="kpi-label">En attente</div>
+          <div class="kpi-value">${fmtEur(totalUnpaid)}</div>
+        </div>
+        <div class="card kpi kpi-danger">
+          <div class="kpi-icon">${ICONS.receipt}</div>
+          <div class="kpi-label">Charges</div>
+          <div class="kpi-value">${fmtEur(totalExp)}</div>
+        </div>
+        <div class="card kpi kpi-dark">
+          <div class="kpi-icon">${ICONS.trending}</div>
+          <div class="kpi-label">Net</div>
+          <div class="kpi-value">${fmtEur(totalPaid - totalExp)}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">CA encaissé par prestation</h3>
+        <div class="chart-wrap" style="height:280px"><canvas id="chartBar"></canvas></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title">🚨 Impayés (${unpaid.length})</h3>
+          ${unpaid.length === 0
+            ? '<div class="empty">Aucun impayé 🎉</div>'
+            : `<div class="mini-list">${unpaid.map(c => `
+                <div class="mini-item">
+                  <span>${escapeHtml(c.title)}</span>
+                  <strong style="color:var(--warning)">${fmtEur(c.amount)}</strong>
+                </div>`).join('')}</div>`}
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">✅ Derniers paiements</h3>
+          ${paid.length === 0
+            ? '<div class="empty">Aucun paiement encore</div>'
+            : `<div class="mini-list">${paid.slice(-5).reverse().map(c => `
+                <div class="mini-item">
+                  <span>${escapeHtml(c.title)}</span>
+                  <strong style="color:var(--success)">${fmtEur(c.amount)}</strong>
+                </div>`).join('')}</div>`}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" style="margin:0">Charges & dépenses</h3>
+          <button class="btn btn-primary" onclick="openExpenseModal()">${ICONS.plus} Ajouter</button>
+        </div>
+        ${expenses.length === 0
+          ? '<div class="empty">Aucune charge</div>'
+          : `<table class="table">
+              <thead><tr><th>Libellé</th><th>Catégorie</th><th>Date</th><th>Montant</th><th></th></tr></thead>
+              <tbody>
+                ${expenses.map(e => `
+                  <tr>
+                    <td>${escapeHtml(e.label)}</td>
+                    <td>${badge(e.category, 'var(--blue)')}</td>
+                    <td>${fmtDate(e.date)}</td>
+                    <td><strong>${fmtEur(e.amount)}</strong></td>
+                    <td><div class="row-actions">
+                      <button class="icon-btn" onclick="openExpenseModal('${e.id}')">${ICONS.edit}</button>
+                      <button class="icon-btn icon-btn-danger" onclick="deleteExpense('${e.id}')">${ICONS.trash}</button>
+                    </div></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`}
+      </div>
+    </div>
+  `;
+}
+
+function renderAccountingChart() {
+  const ctx = document.getElementById('chartBar');
+  if (!ctx) return;
+  if (chartBar) chartBar.destroy();
+
+  const data = SERVICES.map(s => ({
+    label: s.label,
+    value: state.contracts.filter(c => c.service === s.id && c.invoiceStatus === 'paid')
+      .reduce((sum,c)=>sum+Number(c.amount||0),0),
+    color: s.color,
+  }));
+
+  chartBar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(x => x.label),
+      datasets: [{
+        data: data.map(x => x.value),
+        backgroundColor: data.map(x => x.color),
+        borderRadius: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (c) => fmtEur(c.parsed.y) } }
+      },
+      scales: {
+        y: { ticks: { callback: v => fmtEur(v) }, grid: { color: '#f3f4f6' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function openExpenseModal(id) {
+  const e = id ? state.expenses.find(x => x.id === id) : { label:'', amount:'', category:'Logiciels', date: todayISO(), notes:'' };
+  const cats = ['Logiciels','Matériel','URSSAF','Impôts','Communication','Déplacement','Autre'];
+
+  openModal(id ? 'Modifier charge' : 'Nouvelle charge', `
+    ${field('Libellé *', `<input class="field-input" id="f_label" value="${escapeHtml(e.label)}">`)}
+    <div class="grid-2-form">
+      ${field('Montant (€)', `<input class="field-input" type="number" step="0.01" id="f_amount" value="${escapeHtml(e.amount)}">`)}
+      ${field('Catégorie', select('f_category', cats.map(c=>({value:c,label:c})), e.category))}
+    </div>
+    ${field('Date', `<input class="field-input" type="date" id="f_date" value="${e.date||''}">`)}
+    ${field('Notes', `<textarea class="field-input" id="f_notes">${escapeHtml(e.notes||'')}</textarea>`)}
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitModal()">${id?'Enregistrer':'Ajouter'}</button>
+    </div>
+  `, () => {
+    const data = {
+      label:    document.getElementById('f_label').value.trim(),
+      amount:   Number(document.getElementById('f_amount').value) || 0,
+      category: document.getElementById('f_category').value,
+      date:     document.getElementById('f_date').value,
+      notes:    document.getElementById('f_notes').value,
+    };
+    if (!data.label) return;
+    if (id) state.expenses = state.expenses.map(x => x.id === id ? { ...data, id } : x);
+    else state.expenses.push({ ...data, id: uid() });
+    saveAll();
+    closeModal();
+    render();
+  });
+}
+
+function deleteExpense(id) {
+  if (!confirm('Supprimer cette charge ?')) return;
+  state.expenses = state.expenses.filter(x => x.id !== id);
+  saveAll();
+  render();
+}
+
+// ============================================================
+// PROJETS (KANBAN)
+// ============================================================
+function renderProjects() {
+  const clientName = id => state.clients.find(c => c.id === id)?.name || '—';
+
+  return `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Projets</h2>
+          <p class="view-subtitle">${state.projects.length} projet${state.projects.length>1?'s':''}</p>
+        </div>
+        <button class="btn btn-primary" onclick="openProjectModal()">${ICONS.plus} Nouveau projet</button>
+      </div>
+
+      <div class="kanban">
+        ${Object.entries(PROJECT_STATUS).map(([key, s]) => {
+          const items = state.projects.filter(p => p.status === key);
+          return `
+            <div class="kanban-col">
+              <div class="kanban-header" style="border-top-color:${s.color}">
+                <div style="color:${s.color}">${ICONS[s.icon]} <strong style="color:var(--text)">${s.label}</strong></div>
+                <span class="kanban-count">${items.length}</span>
+              </div>
+              <div class="kanban-items">
+                ${items.map(p => {
+                  const srv = SERVICES.find(x => x.id === p.service);
+                  return `
+                    <div class="card project-card">
+                      <div class="project-header">
+                        <h4>${escapeHtml(p.title)}</h4>
+                        <div class="card-actions">
+                          <button class="icon-btn" onclick="openProjectModal('${p.id}')">${ICONS.edit}</button>
+                          <button class="icon-btn icon-btn-danger" onclick="deleteProject('${p.id}')">${ICONS.trash}</button>
+                        </div>
+                      </div>
+                      <p class="project-client">${escapeHtml(clientName(p.clientId))}</p>
+                      ${srv ? badge(srv.label, srv.color) : ''}
+                      ${p.deadline ? `
+                        <div class="project-deadline">${ICONS.calendar} ${fmtDate(p.deadline)}</div>
+                      ` : ''}
+                      ${key === 'in_progress' ? `
+                        <div class="progress-wrap">
+                          <div class="progress-bar">
+                            <div class="progress-fill" style="width:${p.progress || 0}%"></div>
+                          </div>
+                          <span>${p.progress || 0}%</span>
+                        </div>
+                      ` : ''}
+                    </div>
+                  `;
+                }).join('')}
+                ${items.length === 0 ? '<div class="kanban-empty">Rien ici</div>' : ''}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function openProjectModal(id) {
+  const p = id ? state.projects.find(x => x.id === id) : {
+    title:'', clientId:'', service:'identite',
+    status:'not_started', startDate: todayISO(), deadline:'',
+    progress: 0, notes:'',
+  };
+  const clientOpts = [{id:'', name:'— Aucun —'}, ...state.clients];
+
+  openModal(id ? 'Modifier projet' : 'Nouveau projet', `
+    ${field('Titre *', `<input class="field-input" id="f_title" value="${escapeHtml(p.title)}">`)}
+    ${field('Client', select('f_clientId', clientOpts.map(x=>({value:x.id,label:x.name})), p.clientId))}
+    <div class="grid-2-form">
+      ${field('Prestation', select('f_service', SERVICES.map(s=>({value:s.id,label:s.label})), p.service))}
+      ${field('Statut', select('f_status', Object.entries(PROJECT_STATUS).map(([k,v])=>({value:k,label:v.label})), p.status))}
+    </div>
+    <div class="grid-2-form">
+      ${field('Date de début', `<input class="field-input" type="date" id="f_startDate" value="${p.startDate||''}">`)}
+      ${field('Deadline', `<input class="field-input" type="date" id="f_deadline" value="${p.deadline||''}">`)}
+    </div>
+    ${field('Avancement (%)', `<input class="field-input" type="number" min="0" max="100" id="f_progress" value="${p.progress||0}">`)}
+    ${field('Notes', `<textarea class="field-input" id="f_notes">${escapeHtml(p.notes||'')}</textarea>`)}
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitModal()">${id?'Enregistrer':'Créer'}</button>
+    </div>
+  `, () => {
+    const data = {
+      title:     document.getElementById('f_title').value.trim(),
+      clientId:  document.getElementById('f_clientId').value,
+      service:   document.getElementById('f_service').value,
+      status:    document.getElementById('f_status').value,
+      startDate: document.getElementById('f_startDate').value,
+      deadline:  document.getElementById('f_deadline').value,
+      progress:  Number(document.getElementById('f_progress').value) || 0,
+      notes:     document.getElementById('f_notes').value,
+    };
+    if (!data.title) return;
+    if (id) state.projects = state.projects.map(x => x.id === id ? { ...data, id } : x);
+    else state.projects.push({ ...data, id: uid() });
+    saveAll();
+    closeModal();
+    render();
+  });
+}
+
+function deleteProject(id) {
+  if (!confirm('Supprimer ce projet ?')) return;
+  state.projects = state.projects.filter(x => x.id !== id);
+  saveAll();
+  render();
+}
+
+// ============================================================
+// HELPERS HTML
+// ============================================================
+function field(label, input) {
+  return `<label class="field"><span class="field-label">${label}</span>${input}</label>`;
+}
+function select(id, options, value) {
+  return `<select class="field-input" id="${id}">${options.map(o =>
+    `<option value="${escapeHtml(o.value)}" ${o.value===value?'selected':''}>${escapeHtml(o.label)}</option>`
+  ).join('')}</select>`;
+}
+function badge(label, color) {
+  return `<span class="badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${escapeHtml(label)}</span>`;
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+render();
+</script>
+
+</body>
+</html>
