@@ -1194,13 +1194,12 @@ function renderDashboardCharts() {
 // ============================================================
 
 const PROSPECT_STATUS = {
-  to_contact:   { label: 'À contacter',      color: '#9ca3af', order: 1 },
-  contacted:    { label: 'Contacté',         color: '#6296f7', order: 2 },
-  in_discussion:{ label: 'En discussion',    color: '#afc1ed', order: 3 },
-  quote_sent:   { label: 'Devis envoyé',     color: '#f59e0b', order: 4 },
-  won:          { label: 'Gagné 🎉',         color: '#10b981', order: 5 },
-  lost:         { label: 'Perdu',            color: '#ef4444', order: 6 },
-  on_hold:      { label: 'En pause',         color: '#6b7280', order: 7 },
+  to_contact:    { label: 'À contacter',     color: '#9ca3af', order: 1 },
+  relance_1:     { label: '1ère relance',    color: '#6296f7', order: 2 },
+  relance_2:     { label: '2ème relance',    color: '#afc1ed', order: 3 },
+  interested:    { label: 'Intéressé',       color: '#10b981', order: 4 },
+  quote_sent:    { label: 'Devis envoyé ✅', color: '#2321bc', order: 5 },
+  lost:          { label: 'Non aboutie',     color: '#ef4444', order: 6 },
 };
 
 const PROSPECT_SOURCES = [
@@ -1291,19 +1290,38 @@ function renderProspection() {
     };
   });
 
-  // Alertes : actions en retard ou aujourd'hui
+  // Alertes : actions planifiées en retard OU aujourd'hui
   const overdue = all.filter(p => {
-    if (!p.nextActionDate || ['won','lost','on_hold'].includes(p.status)) return false;
+    if (!p.nextActionDate || ['quote_sent','lost'].includes(p.status)) return false;
     const d = daysDiff(p.nextActionDate);
     return d !== null && d <= 0;
   });
 
-  const totalPipeline = all
-    .filter(p => !['won','lost'].includes(p.status))
+  // Rappels : prospects sans réponse depuis longtemps (à relancer)
+  // Règle : dernier contact > 7j + pas de prochaine action planifiée + statut actif
+  const toFollowUp = all.filter(p => {
+    if (['quote_sent','lost','interested'].includes(p.status)) return false;
+    if (p.nextActionDate) return false; // déjà planifié
+    if (!p.lastContactDate) return false; // jamais contacté
+    const d = daysDiff(p.lastContactDate);
+    return d !== null && d <= -7; // dernier contact il y a 7j ou plus
+  });
+
+  // Prospects jamais contactés depuis leur ajout (> 3j)
+  const neverContacted = all.filter(p => {
+    if (p.status !== 'to_contact') return false;
+    if (p.lastContactDate) return false;
+    if (!p.createdAt) return true;
+    const d = daysDiff(p.createdAt);
+    return d !== null && d <= -3;
+  });
+
+  const totalToSendQuote = all
+    .filter(p => !['quote_sent','lost'].includes(p.status))
     .reduce((s,p) => s + Number(p.budget||0), 0);
 
-  const totalWon = all
-    .filter(p => p.status === 'won')
+  const totalQuoteSent = all
+    .filter(p => p.status === 'quote_sent')
     .reduce((s,p) => s + Number(p.budget||0), 0);
 
   return `
@@ -1311,7 +1329,7 @@ function renderProspection() {
       <div class="view-header">
         <div>
           <h2 class="view-title">Prospection</h2>
-          <p class="view-subtitle">${all.length} prospect${all.length>1?'s':''} • Pipeline : ${fmtEur(totalPipeline)} • Gagné : ${fmtEur(totalWon)}</p>
+          <p class="view-subtitle">${all.length} prospect${all.length>1?'s':''} • Potentiel pipeline : ${fmtEur(totalToSendQuote)} • Devis envoyés : ${fmtEur(totalQuoteSent)}</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-secondary" onclick="exportProspectsCSV()">${ICONS.download} Exporter CSV</button>
@@ -1323,8 +1341,26 @@ function renderProspection() {
         <div class="prospect-alert">
           ${ICONS.alert}
           <div>
-            <strong>${overdue.length} action${overdue.length>1?'s':''} à faire aujourd'hui ou en retard :</strong>
+            <strong>${overdue.length} action${overdue.length>1?'s':''} planifiée${overdue.length>1?'s':''} à faire aujourd'hui ou en retard :</strong>
             ${overdue.slice(0, 3).map(p => escapeHtml(p.company)).join(', ')}${overdue.length > 3 ? `, +${overdue.length - 3} autres` : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${toFollowUp.length > 0 ? `
+        <div class="prospect-alert" style="background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);border-left-color:var(--blue)">
+          ${ICONS.clock}
+          <div style="color:#1e3a8a">
+            <strong>${toFollowUp.length} prospect${toFollowUp.length>1?'s':''} sans nouvelles depuis + de 7 jours</strong> — pense à relancer : ${toFollowUp.slice(0, 3).map(p => escapeHtml(p.company)).join(', ')}${toFollowUp.length > 3 ? `, +${toFollowUp.length - 3}` : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${neverContacted.length > 0 ? `
+        <div class="prospect-alert" style="background:linear-gradient(135deg,#f0f2f9 0%,#e0e7ff 100%);border-left-color:var(--dark-blue)">
+          ${ICONS.target}
+          <div style="color:#1e1b4b">
+            <strong>${neverContacted.length} prospect${neverContacted.length>1?'s':''} à contacter</strong> ajouté${neverContacted.length>1?'s':''} il y a + de 3 jours et jamais contacté${neverContacted.length>1?'s':''} : ${neverContacted.slice(0, 3).map(p => escapeHtml(p.company)).join(', ')}${neverContacted.length > 3 ? `, +${neverContacted.length - 3}` : ''}
           </div>
         </div>
       ` : ''}
@@ -1406,10 +1442,10 @@ function renderProspection() {
                       <td class="prospect-budget">${p.budget ? fmtEur(p.budget) : '<span style="color:var(--muted);font-weight:normal">—</span>'}</td>
                       <td style="font-size:11px;color:var(--muted)">${p.source ? escapeHtml(p.source) : '—'}</td>
                       <td>${formatDateWithWarning(p.lastContactDate, false)}</td>
-                      <td>${['won','lost','on_hold'].includes(p.status) ? '<span class="prospect-date-ok">—</span>' : formatDateWithWarning(p.nextActionDate, true)}</td>
+                      <td>${['quote_sent','lost'].includes(p.status) ? '<span class="prospect-date-ok">—</span>' : formatDateWithWarning(p.nextActionDate, true)}</td>
                       <td>
                         <div class="prospect-actions-btn">
-                          ${!['won','lost'].includes(p.status) ? `<button class="icon-btn" title="Convertir en client" onclick="convertProspectToClient('${p.id}')" style="color:var(--success)">${ICONS.userPlus}</button>` : ''}
+                          ${!['quote_sent','lost'].includes(p.status) ? `<button class="icon-btn" title="Convertir en client + devis envoyé" onclick="convertProspectToClient('${p.id}')" style="color:var(--success)">${ICONS.userPlus}</button>` : ''}
                           <button class="icon-btn" title="Modifier" onclick="openProspectModal('${p.id}')">${ICONS.edit}</button>
                           <button class="icon-btn icon-btn-danger" title="Supprimer" onclick="deleteProspect('${p.id}')">${ICONS.trash}</button>
                         </div>
@@ -1517,7 +1553,7 @@ function deleteProspect(id) {
 function convertProspectToClient(id) {
   const p = state.prospects.find(x => x.id === id);
   if (!p) return;
-  if (!confirm(`Convertir "${p.company}" en client ?\n\nLe prospect sera marqué comme "Gagné" et un nouveau client sera créé.`)) return;
+  if (!confirm(`Convertir "${p.company}" en client ?\n\nLe prospect passera en "Devis envoyé" et un nouveau client sera créé.\nTu pourras alors créer le contrat dans l'onglet Contrats.`)) return;
 
   // Créer client
   state.clients.push({
@@ -1529,11 +1565,11 @@ function convertProspectToClient(id) {
     location: '',
   });
 
-  // Marquer prospect comme gagné
-  state.prospects = state.prospects.map(x => x.id === id ? { ...x, status: 'won' } : x);
+  // Marquer prospect comme devis envoyé
+  state.prospects = state.prospects.map(x => x.id === id ? { ...x, status: 'quote_sent' } : x);
 
   saveAll();
-  alert('✅ Client créé ! Tu peux maintenant créer un contrat pour lui.');
+  alert('✅ Client créé et prospect marqué "Devis envoyé".\nVa dans Contrats pour créer le devis pour lui.');
   render();
 }
 
