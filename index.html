@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design by Cloe — Plateforme de pilotage</title>
+<title>Design by Cloé — Plateforme de pilotage</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -143,6 +143,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   /* ========== BUTTONS ========== */
@@ -172,6 +174,12 @@
   }
   .btn-ghost { background: transparent; color: var(--muted); }
   .btn-ghost:hover { background: var(--pastel); color: var(--dark-blue); }
+  .btn-secondary {
+    background: white;
+    color: var(--dark-blue);
+    border: 1.5px solid var(--dark-blue);
+  }
+  .btn-secondary:hover { background: var(--dark-blue); color: white; }
 
   .icon-btn {
     background: transparent;
@@ -216,6 +224,14 @@
     color: var(--text);
     letter-spacing: -0.5px;
   }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .kpi-sub.up { color: var(--success); }
+  .kpi-sub.down { color: var(--danger); }
   .kpi-coral .kpi-icon { background: #fce5e2; color: var(--coral); }
   .kpi-warning .kpi-icon { background: #fef3c7; color: var(--warning); }
   .kpi-blue .kpi-icon { background: #dbeafe; color: var(--blue); }
@@ -353,9 +369,12 @@
   .table td {
     padding: 12px;
     border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
   }
   .table tr:hover td { background: #f9fafb; }
   .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+  .amount-in { color: var(--success); font-weight: 700; }
+  .amount-out { color: var(--danger); font-weight: 700; }
 
   /* ========== MINI LIST ========== */
   .mini-list { display: flex; flex-direction: column; gap: 8px; }
@@ -457,6 +476,100 @@
     transition: width 0.3s;
   }
 
+  /* ========== MONTH SELECTOR ========== */
+  .month-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 18px;
+    box-shadow: 0 1px 3px rgba(35, 33, 188, 0.04), 0 4px 20px rgba(35, 33, 188, 0.04);
+    border: 1px solid rgba(35, 33, 188, 0.05);
+  }
+  .month-nav-btn {
+    background: var(--pastel);
+    border: none;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    color: var(--dark-blue);
+    transition: all 0.2s;
+  }
+  .month-nav-btn:hover { background: var(--dark-blue); color: white; }
+  .month-nav-btn svg { width: 18px; height: 18px; }
+  .month-label {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--dark-blue);
+    letter-spacing: -0.3px;
+    text-transform: capitalize;
+  }
+  .month-today {
+    font-size: 10px;
+    background: var(--coral);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* ========== BILAN BANNER ========== */
+  .bilan-banner {
+    background: linear-gradient(135deg, var(--dark-blue) 0%, var(--dark-blue-deep) 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bilan-banner::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(247,108,94,0.25), transparent 70%);
+    pointer-events: none;
+  }
+  .bilan-item {
+    position: relative;
+    z-index: 1;
+  }
+  .bilan-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    opacity: 0.7;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .bilan-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  .bilan-item.in .bilan-value { color: #a7f3d0; }
+  .bilan-item.out .bilan-value { color: #fecaca; }
+  .bilan-item.net .bilan-value { color: white; }
+  .bilan-sub {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  @media (max-width: 700px) {
+    .bilan-banner { grid-template-columns: 1fr; gap: 16px; padding: 24px; }
+    .bilan-value { font-size: 26px; }
+  }
+
   /* ========== MODAL ========== */
   .modal-overlay {
     position: fixed;
@@ -553,6 +666,33 @@
     height: 260px;
   }
 
+  /* Tabs compta */
+  .sub-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--pastel);
+    padding: 4px;
+    border-radius: 12px;
+    width: fit-content;
+  }
+  .sub-tab {
+    padding: 8px 18px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sub-tab.active {
+    background: white;
+    color: var(--dark-blue);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
   /* ========== RESPONSIVE ========== */
   @media (max-width: 900px) {
     .app { grid-template-columns: 1fr; }
@@ -573,7 +713,7 @@
     <div class="brand">
       <div class="brand-logo">D<span>C</span></div>
       <div class="brand-text">
-        <strong>Design by Cloe</strong>
+        <strong>Design by Cloé</strong>
         <small>Plateforme de pilotage</small>
       </div>
     </div>
@@ -581,7 +721,7 @@
     <nav class="nav" id="nav"></nav>
 
     <div class="sidebar-footer">
-      <div class="footer-tag">Plateforme développé par Cloé Laurin</div>
+      <div class="footer-tag">Made with ♥ in Ardennes</div>
     </div>
   </aside>
 
@@ -631,6 +771,8 @@ const PROJECT_STATUS = {
 // État global — chargé depuis localStorage
 let state = {
   view: 'dashboard',
+  accountingTab: 'monthly',
+  currentMonth: new Date().toISOString().slice(0, 7), // YYYY-MM
   clients:   load('dbc:clients',   []),
   contracts: load('dbc:contracts', []),
   projects:  load('dbc:projects',  []),
@@ -656,7 +798,7 @@ function saveAll() {
 }
 
 // ============================================================
-// ICONS (SVG inline)
+// ICONS
 // ============================================================
 const ICONS = {
   dashboard: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
@@ -678,6 +820,11 @@ const ICONS = {
   circle:    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>',
   play:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
   calendar:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  chevronL:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  chevronR:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  download:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  arrowUp:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+  arrowDown: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
 };
 
 // ============================================================
@@ -688,6 +835,22 @@ const fmtDate = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
 const todayISO = () => new Date().toISOString().split('T')[0];
 const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Date.now().toString() + Math.random().toString(36).slice(2, 6);
+
+const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function monthLabel(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  return `${MONTHS_FR[m-1]} ${y}`;
+}
+function prevMonth(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function nextMonth(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const d = new Date(y, m, 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
 
 // ============================================================
 // MODAL
@@ -746,7 +909,7 @@ function render() {
     case 'dashboard':  main.innerHTML = renderDashboard();  renderDashboardCharts(); break;
     case 'clients':    main.innerHTML = renderClients();    break;
     case 'contracts':  main.innerHTML = renderContracts();  break;
-    case 'accounting': main.innerHTML = renderAccounting(); renderAccountingChart(); break;
+    case 'accounting': main.innerHTML = renderAccounting(); renderAccountingCharts(); break;
     case 'projects':   main.innerHTML = renderProjects();   break;
   }
 }
@@ -848,12 +1011,10 @@ function renderDashboard() {
   `;
 }
 
-let chartMonthly, chartPie, chartBar;
+let chartMonthly, chartPie, chartBar, chartMonthlyCompare;
 
 function renderDashboardCharts() {
   const s = computeStats();
-
-  // LINE / AREA chart
   const ctx1 = document.getElementById('chartMonthly');
   if (ctx1) {
     if (chartMonthly) chartMonthly.destroy();
@@ -877,12 +1038,8 @@ function renderDashboardCharts() {
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: (c) => fmtEur(c.parsed.y) } }
-        },
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmtEur(c.parsed.y) } } },
         scales: {
           y: { ticks: { callback: v => fmtEur(v) }, grid: { color: '#f3f4f6' } },
           x: { grid: { display: false } }
@@ -891,7 +1048,6 @@ function renderDashboardCharts() {
     });
   }
 
-  // PIE chart
   const ctx2 = document.getElementById('chartPie');
   if (ctx2 && s.byService.length > 0) {
     if (chartPie) chartPie.destroy();
@@ -902,14 +1058,11 @@ function renderDashboardCharts() {
         datasets: [{
           data: s.byService.map(x => x.value),
           backgroundColor: s.byService.map(x => x.color),
-          borderWidth: 3,
-          borderColor: 'white',
+          borderWidth: 3, borderColor: 'white',
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '60%',
+        responsive: true, maintainAspectRatio: false, cutout: '60%',
         plugins: {
           legend: { position: 'bottom', labels: { font: { size: 11 } } },
           tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtEur(c.parsed)}` } }
@@ -984,22 +1137,16 @@ function openClientModal(id) {
       location: document.getElementById('f_location').value.trim(),
     };
     if (!data.name) return;
-    if (id) {
-      state.clients = state.clients.map(x => x.id === id ? { ...data, id } : x);
-    } else {
-      state.clients.push({ ...data, id: uid() });
-    }
-    saveAll();
-    closeModal();
-    render();
+    if (id) state.clients = state.clients.map(x => x.id === id ? { ...data, id } : x);
+    else state.clients.push({ ...data, id: uid() });
+    saveAll(); closeModal(); render();
   });
 }
 
 function deleteClient(id) {
   if (!confirm('Supprimer ce client ?')) return;
   state.clients = state.clients.filter(x => x.id !== id);
-  saveAll();
-  render();
+  saveAll(); render();
 }
 
 // ============================================================
@@ -1085,7 +1232,6 @@ function openContractModal(id) {
     quoteSentDate: todayISO(), quoteSignedDate:'', invoiceSentDate:'', paidDate:'',
     notes:'',
   };
-
   const clientOpts = [{id:'', name:'— Choisir —'}, ...state.clients];
 
   openModal(id ? 'Modifier contrat' : 'Nouveau contrat', `
@@ -1121,7 +1267,6 @@ function openContractModal(id) {
       paidDate:        document.getElementById('f_paidDate').value,
       notes:           document.getElementById('f_notes').value,
     };
-    // sync invoiceStatus depuis status
     if (status === 'invoice_paid') data.invoiceStatus = 'paid';
     else if (status === 'invoice_sent') data.invoiceStatus = 'sent';
     else data.invoiceStatus = 'none';
@@ -1129,23 +1274,247 @@ function openContractModal(id) {
     if (!data.title || !data.clientId) return;
     if (id) state.contracts = state.contracts.map(x => x.id === id ? { ...data, id } : x);
     else state.contracts.push({ ...data, id: uid() });
-    saveAll();
-    closeModal();
-    render();
+    saveAll(); closeModal(); render();
   });
 }
 
 function deleteContract(id) {
   if (!confirm('Supprimer ce contrat ?')) return;
   state.contracts = state.contracts.filter(x => x.id !== id);
-  saveAll();
-  render();
+  saveAll(); render();
 }
 
 // ============================================================
-// COMPTABILITÉ
+// COMPTABILITÉ — AMÉLIORÉE
 // ============================================================
+
+function getMonthlyData(ym) {
+  // Entrées : factures payées ce mois-là
+  const income = state.contracts
+    .filter(c => c.invoiceStatus === 'paid' && c.paidDate && c.paidDate.startsWith(ym))
+    .map(c => {
+      const client = state.clients.find(x => x.id === c.clientId);
+      const srv = SERVICES.find(x => x.id === c.service);
+      return {
+        type: 'in',
+        date: c.paidDate,
+        label: c.title,
+        client: client?.name || '—',
+        category: srv?.label || 'Autre',
+        categoryColor: srv?.color || '#9ca3af',
+        amount: Number(c.amount || 0),
+      };
+    });
+
+  // Sorties : charges de ce mois
+  const outcome = state.expenses
+    .filter(e => e.date && e.date.startsWith(ym))
+    .map(e => ({
+      type: 'out',
+      date: e.date,
+      label: e.label,
+      client: '',
+      category: e.category || 'Autre',
+      categoryColor: '#6296f7',
+      amount: Number(e.amount || 0),
+    }));
+
+  const totalIn = income.reduce((s,x)=>s+x.amount, 0);
+  const totalOut = outcome.reduce((s,x)=>s+x.amount, 0);
+
+  return {
+    income,
+    outcome,
+    totalIn,
+    totalOut,
+    net: totalIn - totalOut,
+    all: [...income, ...outcome].sort((a,b) => a.date.localeCompare(b.date)),
+  };
+}
+
+function setAccountingTab(tab) {
+  state.accountingTab = tab;
+  render();
+}
+
+function changeMonth(delta) {
+  state.currentMonth = delta > 0 ? nextMonth(state.currentMonth) : prevMonth(state.currentMonth);
+  render();
+}
+
 function renderAccounting() {
+  const tab = state.accountingTab;
+  const ym = state.currentMonth;
+  const data = getMonthlyData(ym);
+  const prevYm = prevMonth(ym);
+  const prevData = getMonthlyData(prevYm);
+  const isCurrentMonth = ym === new Date().toISOString().slice(0, 7);
+
+  // Variation vs mois précédent
+  const inDelta = prevData.totalIn > 0 ? ((data.totalIn - prevData.totalIn) / prevData.totalIn) * 100 : null;
+  const outDelta = prevData.totalOut > 0 ? ((data.totalOut - prevData.totalOut) / prevData.totalOut) * 100 : null;
+
+  return `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">Comptabilité</h2>
+          <p class="view-subtitle">Suivi détaillé de tes entrées et sorties</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="exportMonthCSV()">${ICONS.download} Exporter le mois (CSV)</button>
+          <button class="btn btn-primary" onclick="openExpenseModal()">${ICONS.plus} Nouvelle charge</button>
+        </div>
+      </div>
+
+      <div class="sub-tabs">
+        <button class="sub-tab ${tab==='monthly'?'active':''}" onclick="setAccountingTab('monthly')">📅 Vue mensuelle</button>
+        <button class="sub-tab ${tab==='global'?'active':''}" onclick="setAccountingTab('global')">📊 Vue globale</button>
+      </div>
+
+      ${tab === 'monthly' ? renderMonthlyView(data, ym, isCurrentMonth, inDelta, outDelta) : renderGlobalView()}
+    </div>
+  `;
+}
+
+function renderMonthlyView(data, ym, isCurrentMonth, inDelta, outDelta) {
+  return `
+    <!-- Sélecteur de mois -->
+    <div class="month-selector">
+      <button class="month-nav-btn" onclick="changeMonth(-1)" title="Mois précédent">${ICONS.chevronL}</button>
+      <div class="month-label">
+        ${monthLabel(ym)}
+        ${isCurrentMonth ? '<span class="month-today">EN COURS</span>' : ''}
+      </div>
+      <button class="month-nav-btn" onclick="changeMonth(1)" title="Mois suivant">${ICONS.chevronR}</button>
+    </div>
+
+    <!-- Bilan banner -->
+    <div class="bilan-banner">
+      <div class="bilan-item in">
+        <div class="bilan-label">💰 Entrées</div>
+        <div class="bilan-value">${fmtEur(data.totalIn)}</div>
+        <div class="bilan-sub">
+          ${data.income.length} paiement${data.income.length>1?'s':''} reçu${data.income.length>1?'s':''}
+          ${inDelta !== null ? ` • ${inDelta >= 0 ? '+' : ''}${inDelta.toFixed(0)}% vs mois précédent` : ''}
+        </div>
+      </div>
+      <div class="bilan-item out">
+        <div class="bilan-label">💸 Sorties</div>
+        <div class="bilan-value">${fmtEur(data.totalOut)}</div>
+        <div class="bilan-sub">
+          ${data.outcome.length} dépense${data.outcome.length>1?'s':''}
+          ${outDelta !== null ? ` • ${outDelta >= 0 ? '+' : ''}${outDelta.toFixed(0)}% vs mois précédent` : ''}
+        </div>
+      </div>
+      <div class="bilan-item net">
+        <div class="bilan-label">📈 Solde du mois</div>
+        <div class="bilan-value" style="color:${data.net >= 0 ? '#a7f3d0' : '#fecaca'}">${fmtEur(data.net)}</div>
+        <div class="bilan-sub">${data.net >= 0 ? 'Mois bénéficiaire' : 'Mois déficitaire'}</div>
+      </div>
+    </div>
+
+    <!-- Graphique comparaison 6 mois -->
+    <div class="card">
+      <h3 class="card-title">Entrées vs Sorties — 6 derniers mois</h3>
+      <div class="chart-wrap" style="height:280px"><canvas id="chartCompare"></canvas></div>
+    </div>
+
+    <!-- Deux colonnes : entrées & sorties détaillées -->
+    <div class="grid-2">
+      <!-- ENTRÉES -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" style="margin:0;color:var(--success)">💰 Entrées du mois</h3>
+          <strong style="color:var(--success);font-size:18px">${fmtEur(data.totalIn)}</strong>
+        </div>
+        ${data.income.length === 0 ? '<div class="empty">Aucune entrée ce mois-ci</div>' : `
+          <table class="table">
+            <thead><tr><th>Date</th><th>Libellé</th><th>Client</th><th>Service</th><th style="text-align:right">Montant</th></tr></thead>
+            <tbody>
+              ${data.income.map(i => `
+                <tr>
+                  <td>${fmtDate(i.date)}</td>
+                  <td>${escapeHtml(i.label)}</td>
+                  <td style="color:var(--muted);font-size:12px">${escapeHtml(i.client)}</td>
+                  <td>${badge(i.category, i.categoryColor)}</td>
+                  <td style="text-align:right" class="amount-in">+${fmtEur(i.amount)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+
+      <!-- SORTIES -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" style="margin:0;color:var(--danger)">💸 Sorties du mois</h3>
+          <strong style="color:var(--danger);font-size:18px">${fmtEur(data.totalOut)}</strong>
+        </div>
+        ${data.outcome.length === 0 ? '<div class="empty">Aucune sortie ce mois-ci</div>' : `
+          <table class="table">
+            <thead><tr><th>Date</th><th>Libellé</th><th>Catégorie</th><th style="text-align:right">Montant</th><th></th></tr></thead>
+            <tbody>
+              ${data.outcome.map(o => {
+                // retrouver l'id de la charge pour l'édition
+                const exp = state.expenses.find(e => e.date === o.date && e.label === o.label && Number(e.amount) === o.amount);
+                return `
+                  <tr>
+                    <td>${fmtDate(o.date)}</td>
+                    <td>${escapeHtml(o.label)}</td>
+                    <td>${badge(o.category, '#6296f7')}</td>
+                    <td style="text-align:right" class="amount-out">-${fmtEur(o.amount)}</td>
+                    <td>
+                      ${exp ? `<div class="row-actions">
+                        <button class="icon-btn" onclick="openExpenseModal('${exp.id}')">${ICONS.edit}</button>
+                        <button class="icon-btn icon-btn-danger" onclick="deleteExpense('${exp.id}')">${ICONS.trash}</button>
+                      </div>` : ''}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+    </div>
+
+    <!-- Journal chronologique du mois -->
+    <div class="card">
+      <h3 class="card-title">📖 Journal du mois (chronologique)</h3>
+      ${data.all.length === 0 ? '<div class="empty">Aucun mouvement ce mois-ci</div>' : `
+        <table class="table">
+          <thead><tr><th>Date</th><th>Type</th><th>Libellé</th><th>Catégorie</th><th style="text-align:right">Montant</th><th style="text-align:right">Solde cumulé</th></tr></thead>
+          <tbody>
+            ${(() => {
+              let cumul = 0;
+              return data.all.map(m => {
+                cumul += m.type === 'in' ? m.amount : -m.amount;
+                return `
+                  <tr>
+                    <td>${fmtDate(m.date)}</td>
+                    <td>${m.type === 'in'
+                      ? `<span style="color:var(--success);display:inline-flex;align-items:center;gap:4px;font-weight:600;font-size:12px">${ICONS.arrowUp} Entrée</span>`
+                      : `<span style="color:var(--danger);display:inline-flex;align-items:center;gap:4px;font-weight:600;font-size:12px">${ICONS.arrowDown} Sortie</span>`}</td>
+                    <td>${escapeHtml(m.label)}${m.client ? `<br><small style="color:var(--muted)">${escapeHtml(m.client)}</small>` : ''}</td>
+                    <td>${badge(m.category, m.categoryColor)}</td>
+                    <td style="text-align:right" class="${m.type==='in'?'amount-in':'amount-out'}">
+                      ${m.type==='in' ? '+' : '-'}${fmtEur(m.amount)}
+                    </td>
+                    <td style="text-align:right;font-weight:700;color:${cumul>=0?'var(--success)':'var(--danger)'}">${fmtEur(cumul)}</td>
+                  </tr>
+                `;
+              }).join('');
+            })()}
+          </tbody>
+        </table>
+      `}
+    </div>
+  `;
+}
+
+function renderGlobalView() {
   const { contracts, expenses } = state;
   const paid = contracts.filter(c => c.invoiceStatus === 'paid');
   const unpaid = contracts.filter(c => c.invoiceStatus === 'sent');
@@ -1154,135 +1523,219 @@ function renderAccounting() {
   const totalExp = expenses.reduce((s,e)=>s+Number(e.amount||0),0);
 
   return `
-    <div class="view">
-      <div class="view-header">
-        <div>
-          <h2 class="view-title">Comptabilité</h2>
-          <p class="view-subtitle">Vue financière détaillée</p>
-        </div>
+    <div class="kpi-grid">
+      <div class="card kpi kpi-success">
+        <div class="kpi-icon">${ICONS.check}</div>
+        <div class="kpi-label">Total encaissé</div>
+        <div class="kpi-value">${fmtEur(totalPaid)}</div>
       </div>
+      <div class="card kpi kpi-warning">
+        <div class="kpi-icon">${ICONS.clock}</div>
+        <div class="kpi-label">En attente</div>
+        <div class="kpi-value">${fmtEur(totalUnpaid)}</div>
+      </div>
+      <div class="card kpi kpi-danger">
+        <div class="kpi-icon">${ICONS.receipt}</div>
+        <div class="kpi-label">Total charges</div>
+        <div class="kpi-value">${fmtEur(totalExp)}</div>
+      </div>
+      <div class="card kpi kpi-dark">
+        <div class="kpi-icon">${ICONS.trending}</div>
+        <div class="kpi-label">Bénéfice net</div>
+        <div class="kpi-value">${fmtEur(totalPaid - totalExp)}</div>
+      </div>
+    </div>
 
-      <div class="kpi-grid">
-        <div class="card kpi kpi-success">
-          <div class="kpi-icon">${ICONS.check}</div>
-          <div class="kpi-label">Encaissé</div>
-          <div class="kpi-value">${fmtEur(totalPaid)}</div>
-        </div>
-        <div class="card kpi kpi-warning">
-          <div class="kpi-icon">${ICONS.clock}</div>
-          <div class="kpi-label">En attente</div>
-          <div class="kpi-value">${fmtEur(totalUnpaid)}</div>
-        </div>
-        <div class="card kpi kpi-danger">
-          <div class="kpi-icon">${ICONS.receipt}</div>
-          <div class="kpi-label">Charges</div>
-          <div class="kpi-value">${fmtEur(totalExp)}</div>
-        </div>
-        <div class="card kpi kpi-dark">
-          <div class="kpi-icon">${ICONS.trending}</div>
-          <div class="kpi-label">Net</div>
-          <div class="kpi-value">${fmtEur(totalPaid - totalExp)}</div>
-        </div>
+    <div class="card">
+      <h3 class="card-title">CA encaissé par prestation</h3>
+      <div class="chart-wrap" style="height:280px"><canvas id="chartBar"></canvas></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="card-title">🚨 Impayés (${unpaid.length})</h3>
+        ${unpaid.length === 0
+          ? '<div class="empty">Aucun impayé 🎉</div>'
+          : `<div class="mini-list">${unpaid.map(c => {
+              const clientName = state.clients.find(x => x.id === c.clientId)?.name || '—';
+              return `<div class="mini-item">
+                <div>
+                  <div>${escapeHtml(c.title)}</div>
+                  <small style="color:var(--muted)">${escapeHtml(clientName)}</small>
+                </div>
+                <strong style="color:var(--warning)">${fmtEur(c.amount)}</strong>
+              </div>`;
+            }).join('')}</div>`}
       </div>
 
       <div class="card">
-        <h3 class="card-title">CA encaissé par prestation</h3>
-        <div class="chart-wrap" style="height:280px"><canvas id="chartBar"></canvas></div>
+        <h3 class="card-title">✅ Derniers paiements</h3>
+        ${paid.length === 0
+          ? '<div class="empty">Aucun paiement encore</div>'
+          : `<div class="mini-list">${paid.slice(-5).reverse().map(c => `
+              <div class="mini-item">
+                <div>
+                  <div>${escapeHtml(c.title)}</div>
+                  <small style="color:var(--muted)">${fmtDate(c.paidDate)}</small>
+                </div>
+                <strong style="color:var(--success)">${fmtEur(c.amount)}</strong>
+              </div>`).join('')}</div>`}
       </div>
+    </div>
 
-      <div class="grid-2">
-        <div class="card">
-          <h3 class="card-title">🚨 Impayés (${unpaid.length})</h3>
-          ${unpaid.length === 0
-            ? '<div class="empty">Aucun impayé 🎉</div>'
-            : `<div class="mini-list">${unpaid.map(c => `
-                <div class="mini-item">
-                  <span>${escapeHtml(c.title)}</span>
-                  <strong style="color:var(--warning)">${fmtEur(c.amount)}</strong>
-                </div>`).join('')}</div>`}
-        </div>
-
-        <div class="card">
-          <h3 class="card-title">✅ Derniers paiements</h3>
-          ${paid.length === 0
-            ? '<div class="empty">Aucun paiement encore</div>'
-            : `<div class="mini-list">${paid.slice(-5).reverse().map(c => `
-                <div class="mini-item">
-                  <span>${escapeHtml(c.title)}</span>
-                  <strong style="color:var(--success)">${fmtEur(c.amount)}</strong>
-                </div>`).join('')}</div>`}
-        </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title" style="margin:0">Toutes les charges</h3>
+        <button class="btn btn-primary" onclick="openExpenseModal()">${ICONS.plus} Ajouter</button>
       </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title" style="margin:0">Charges & dépenses</h3>
-          <button class="btn btn-primary" onclick="openExpenseModal()">${ICONS.plus} Ajouter</button>
-        </div>
-        ${expenses.length === 0
-          ? '<div class="empty">Aucune charge</div>'
-          : `<table class="table">
-              <thead><tr><th>Libellé</th><th>Catégorie</th><th>Date</th><th>Montant</th><th></th></tr></thead>
-              <tbody>
-                ${expenses.map(e => `
-                  <tr>
-                    <td>${escapeHtml(e.label)}</td>
-                    <td>${badge(e.category, 'var(--blue)')}</td>
-                    <td>${fmtDate(e.date)}</td>
-                    <td><strong>${fmtEur(e.amount)}</strong></td>
-                    <td><div class="row-actions">
-                      <button class="icon-btn" onclick="openExpenseModal('${e.id}')">${ICONS.edit}</button>
-                      <button class="icon-btn icon-btn-danger" onclick="deleteExpense('${e.id}')">${ICONS.trash}</button>
-                    </div></td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>`}
-      </div>
+      ${expenses.length === 0
+        ? '<div class="empty">Aucune charge</div>'
+        : `<table class="table">
+            <thead><tr><th>Libellé</th><th>Catégorie</th><th>Date</th><th>Montant</th><th></th></tr></thead>
+            <tbody>
+              ${[...expenses].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(e => `
+                <tr>
+                  <td>${escapeHtml(e.label)}</td>
+                  <td>${badge(e.category, 'var(--blue)')}</td>
+                  <td>${fmtDate(e.date)}</td>
+                  <td><strong>${fmtEur(e.amount)}</strong></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openExpenseModal('${e.id}')">${ICONS.edit}</button>
+                    <button class="icon-btn icon-btn-danger" onclick="deleteExpense('${e.id}')">${ICONS.trash}</button>
+                  </div></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>`}
     </div>
   `;
 }
 
-function renderAccountingChart() {
-  const ctx = document.getElementById('chartBar');
-  if (!ctx) return;
-  if (chartBar) chartBar.destroy();
+function renderAccountingCharts() {
+  if (state.accountingTab === 'monthly') {
+    // Graphique comparatif 6 mois (entrées vs sorties)
+    const ctx = document.getElementById('chartCompare');
+    if (!ctx) return;
+    if (chartMonthlyCompare) chartMonthlyCompare.destroy();
 
-  const data = SERVICES.map(s => ({
-    label: s.label,
-    value: state.contracts.filter(c => c.service === s.id && c.invoiceStatus === 'paid')
-      .reduce((sum,c)=>sum+Number(c.amount||0),0),
-    color: s.color,
-  }));
+    const now = new Date();
+    const months = Array.from({length: 6}, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      const md = getMonthlyData(ym);
+      return {
+        label: d.toLocaleDateString('fr-FR',{month:'short', year:'2-digit'}),
+        income: md.totalIn,
+        outcome: md.totalOut,
+      };
+    });
 
-  chartBar = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.map(x => x.label),
-      datasets: [{
-        data: data.map(x => x.value),
-        backgroundColor: data.map(x => x.color),
-        borderRadius: 8,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (c) => fmtEur(c.parsed.y) } }
+    chartMonthlyCompare = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: months.map(x => x.label),
+        datasets: [
+          {
+            label: 'Entrées',
+            data: months.map(x => x.income),
+            backgroundColor: '#10b981',
+            borderRadius: 6,
+          },
+          {
+            label: 'Sorties',
+            data: months.map(x => x.outcome),
+            backgroundColor: '#ef4444',
+            borderRadius: 6,
+          }
+        ]
       },
-      scales: {
-        y: { ticks: { callback: v => fmtEur(v) }, grid: { color: '#f3f4f6' } },
-        x: { grid: { display: false } }
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { font: { size: 12 }, usePointStyle: true } },
+          tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtEur(c.parsed.y)}` } }
+        },
+        scales: {
+          y: { ticks: { callback: v => fmtEur(v) }, grid: { color: '#f3f4f6' } },
+          x: { grid: { display: false } }
+        }
       }
-    }
+    });
+  } else {
+    // Vue globale : graphique par service
+    const ctx = document.getElementById('chartBar');
+    if (!ctx) return;
+    if (chartBar) chartBar.destroy();
+
+    const data = SERVICES.map(s => ({
+      label: s.label,
+      value: state.contracts.filter(c => c.service === s.id && c.invoiceStatus === 'paid')
+        .reduce((sum,c)=>sum+Number(c.amount||0),0),
+      color: s.color,
+    }));
+
+    chartBar = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(x => x.label),
+        datasets: [{
+          data: data.map(x => x.value),
+          backgroundColor: data.map(x => x.color),
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => fmtEur(c.parsed.y) } }
+        },
+        scales: {
+          y: { ticks: { callback: v => fmtEur(v) }, grid: { color: '#f3f4f6' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+}
+
+function exportMonthCSV() {
+  const ym = state.currentMonth;
+  const data = getMonthlyData(ym);
+  const rows = [
+    ['Date', 'Type', 'Libellé', 'Client', 'Catégorie', 'Montant (€)']
+  ];
+  data.all.forEach(m => {
+    rows.push([
+      m.date,
+      m.type === 'in' ? 'Entrée' : 'Sortie',
+      m.label,
+      m.client,
+      m.category,
+      (m.type === 'in' ? m.amount : -m.amount).toFixed(2).replace('.', ','),
+    ]);
   });
+  rows.push([]);
+  rows.push(['TOTAL ENTRÉES', '', '', '', '', data.totalIn.toFixed(2).replace('.', ',')]);
+  rows.push(['TOTAL SORTIES', '', '', '', '', (-data.totalOut).toFixed(2).replace('.', ',')]);
+  rows.push(['SOLDE NET', '', '', '', '', data.net.toFixed(2).replace('.', ',')]);
+
+  const csv = '\uFEFF' + rows.map(r =>
+    r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')
+  ).join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `compta-${ym}-design-by-cloe.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function openExpenseModal(id) {
   const e = id ? state.expenses.find(x => x.id === id) : { label:'', amount:'', category:'Logiciels', date: todayISO(), notes:'' };
-  const cats = ['Logiciels','Matériel','URSSAF','Impôts','Communication','Déplacement','Autre'];
+  const cats = ['Logiciels','Matériel','URSSAF','Impôts','Communication','Déplacement','Formation','Banque','Autre'];
 
   openModal(id ? 'Modifier charge' : 'Nouvelle charge', `
     ${field('Libellé *', `<input class="field-input" id="f_label" value="${escapeHtml(e.label)}">`)}
@@ -1307,21 +1760,18 @@ function openExpenseModal(id) {
     if (!data.label) return;
     if (id) state.expenses = state.expenses.map(x => x.id === id ? { ...data, id } : x);
     else state.expenses.push({ ...data, id: uid() });
-    saveAll();
-    closeModal();
-    render();
+    saveAll(); closeModal(); render();
   });
 }
 
 function deleteExpense(id) {
   if (!confirm('Supprimer cette charge ?')) return;
   state.expenses = state.expenses.filter(x => x.id !== id);
-  saveAll();
-  render();
+  saveAll(); render();
 }
 
 // ============================================================
-// PROJETS (KANBAN)
+// PROJETS
 // ============================================================
 function renderProjects() {
   const clientName = id => state.clients.find(c => c.id === id)?.name || '—';
@@ -1422,17 +1872,14 @@ function openProjectModal(id) {
     if (!data.title) return;
     if (id) state.projects = state.projects.map(x => x.id === id ? { ...data, id } : x);
     else state.projects.push({ ...data, id: uid() });
-    saveAll();
-    closeModal();
-    render();
+    saveAll(); closeModal(); render();
   });
 }
 
 function deleteProject(id) {
   if (!confirm('Supprimer ce projet ?')) return;
   state.projects = state.projects.filter(x => x.id !== id);
-  saveAll();
-  render();
+  saveAll(); render();
 }
 
 // ============================================================
